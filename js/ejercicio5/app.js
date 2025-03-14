@@ -1,4 +1,4 @@
-import {getUsuarios,getPost,getCommets,getAlbums,getPhotos} from "./modulos/index.js";
+import {getUsuarios,getPost,getCommets,getAlbums,getPhotos} from "../modulos/index.js";
 //este barril ingresa todos los modelos hechos anteriormente para realizar mejores practicas
 //y dentro de index.js se encuentra todos los modulos diseñados para la solicitudes y se
 ///especifica la dirrecion
