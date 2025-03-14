@@ -1,10 +1,59 @@
-import {getUsuarios,getPost,getCommets,getAlbums,getPhotos} from "../modulos/index.js";
+import {getUsuarios,getPost,getCommets,getAlbums,getPhotos} from "./modulos/index.js";
 //este barril ingresa todos los modelos hechos anteriormente para realizar mejores practicas
 //y dentro de index.js se encuentra todos los modulos diseñados para la solicitudes y se
 ///especifica la dirrecion
 const URL = "https://jsonplaceholder.typicode.com";//este URL es el que es repetido por todas las partes
 //del codigo y se utiliza para que el codigo sea mas ordenado
-
+const ListasPendientes = async () => {
+  const usuarios = await getUsuarios(URL);
+  usuarios.map( usuario =>
+  { 
+    console.log(`${usuario.id}.${usuario.company.bs}`);
+  });
+   
+};
+const encontrarUsuario = async (username) => {
+  const usuarios = await getUsuarios(URL);
+  return await Promise.all(usuarios.map(async (usuario) =>
+  {
+    if (username.toLowerCase() == (usuario.username).toLowerCase()) {
+      const albums = await getAlbums(URL, usuario);
+      const photoAlbum = await Promise.all(
+        albums.map(async (albums) => {
+          const photos = await getPhotos(URL, albums);
+          return { ...albums, photos };
+        })
+      );
+      console.log({ ...usuario, photoAlbum});
+    }
+  }));
+};
+const filtrarPost = async (postName) => {
+  const usuarios = await getUsuarios(URL);
+  return await Promise.all(
+    usuarios.map(async (usuario) => {
+      const posts = await getPost(URL, usuario);
+      await Promise.all(
+        posts.map(async (post) => {
+          if (postName.toLowerCase() == post.title.toLowerCase()) {
+            const coments = await getCommets(URL, post);
+            console.log({ ...post, coments });
+          }
+        })
+      );
+    })
+  );
+};
+const ModificarEstructura = async () => {
+  const usuarios = await getUsuarios(URL);
+  let nombreTelf = new Array();
+  await Promise.all(
+    usuarios.map(async (usuario) => {
+      nombreTelf.push(`Nombre:${usuario.name} - Telf:${usuario.phone}`);
+    })
+  );
+  return nombreTelf;
+};
 // const usuarioId=3; este codigo esta diseñado para buscar los post especificos de un usuario
 
 // const getusuarioId= async (usuarioId)=>{
@@ -13,7 +62,6 @@ const URL = "https://jsonplaceholder.typicode.com";//este URL es el que es repet
 // }
 
 // getusuarioId(usuarioId);
-
 const manejardatos = async () => {//manejar datos es la promesa principal donde ocurre todo
     const usuarios =  await getUsuarios(URL);//se accede al metodo getusuarios que nos devuelve un
     //objeto que contiene todos los usuarios y se utiliza await para que devuelva una promesa cumplida
@@ -49,7 +97,50 @@ const manejardatos = async () => {//manejar datos es la promesa principal donde 
         //y post con sus comentarios
     }));
 };
-manejardatos().then((data)=>{//accede ala impresion de la promesa con then y usa data para que imprime el
-    //return y despues de usa en un console log
-    console.log(data);
-});
+let cont = 0;
+while (cont == 0)
+{
+  let menu = parseInt(prompt("Ingrese el numero de cual funcionalidad desea Ejecutar \n1.Lista pendientes\n2.encontrar Usuario\n3.filtrar Post\n4.Modificar Estructura\n5.Manejar datos"));
+  switch (menu) {
+    case 1:
+      ListasPendientes().then();
+      cont++;
+      break;
+    case 2:
+      let username = prompt(
+        "Ingrese un usuario"
+        //usuarios que se pueden poner Bret,Antonette,Samantha,Karianne,Kamren,Leopoldo_Corkery,Elwyn.Skiles,Maxime_Nienow,Delphine,Moriah.Stanton
+      );
+      encontrarUsuario(username).then();
+      cont++;
+      break;
+    case 3:
+      let postName = prompt("Ingrese el nombre del post que desea buscar");
+      filtrarPost(postName).then();
+      cont++;
+      break;
+    case 4:
+      ModificarEstructura().then((data) => {
+        // for (let rept = 0; rept < data.length; rept++)
+        // {
+        //   console.log(data[rept]);
+        // }
+        data.map(async (nomTel) => {
+          console.log(nomTel);
+        });
+      });
+      cont++;
+      break;
+    case 5:
+      manejardatos().then((data) => {
+        //accede ala impresion de la promesa con then y usa data para que imprime el
+        //return y despues de usa en un console log
+        console.log(data);
+      });
+      cont++;
+      break;
+    default:
+      alert("Error numero no valido ingreselo nuevamente");
+      break;
+  }
+}
