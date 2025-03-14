@@ -1,4 +1,4 @@
-import {getUsuarios,getPost,getCommets,getAlbums,getPhotos} from "./modulos/index.js";
+import {getUsuarios,getPost,getCommets,getAlbums,getPhotos,getTareas} from "./modulos/index.js";
 //este barril ingresa todos los modelos hechos anteriormente para realizar mejores practicas
 //y dentro de index.js se encuentra todos los modulos diseñados para la solicitudes y se
 ///especifica la dirrecion
@@ -6,17 +6,23 @@ const URL = "https://jsonplaceholder.typicode.com";//este URL es el que es repet
 //del codigo y se utiliza para que el codigo sea mas ordenado
 const ListasPendientes = async () => {
   const usuarios = await getUsuarios(URL);
-  usuarios.map( usuario =>
-  { 
-    console.log(`${usuario.id}.${usuario.company.bs}`);
-  });
+  return await Promise.all(
+    usuarios.map(async (usuario) => {
+      const tareas = await getTareas(URL, usuario);
+      return tareas
+    })
+  );
    
 };
 const encontrarUsuario = async (username) => {
   const usuarios = await getUsuarios(URL);
+  let ListaUsers = new Array();
+  usuarios.map(async (usuario) => {ListaUsers.push(usuario.username);});
   return await Promise.all(usuarios.map(async (usuario) =>
   {
-    if (username.toLowerCase() == (usuario.username).toLowerCase()) {
+    const filterUser = ListaUsers.filter((ListaUsers) => ListaUsers == username);
+    if (filterUser == usuario.username)
+    {
       const albums = await getAlbums(URL, usuario);
       const photoAlbum = await Promise.all(
         albums.map(async (albums) => {
@@ -24,7 +30,7 @@ const encontrarUsuario = async (username) => {
           return { ...albums, photos };
         })
       );
-      console.log({ ...usuario, photoAlbum});
+      console.log({ ...usuario, photoAlbum });
     }
   }));
 };
@@ -45,14 +51,17 @@ const filtrarPost = async (postName) => {
   );
 };
 const ModificarEstructura = async () => {
-  const usuarios = await getUsuarios(URL);
-  let nombreTelf = new Array();
-  await Promise.all(
-    usuarios.map(async (usuario) => {
-      nombreTelf.push(`Nombre:${usuario.name} - Telf:${usuario.phone}`);
-    })
-  );
-  return nombreTelf;
+  try {
+    const usuarios = await getUsuarios(URL);
+    return await Promise.all(
+      usuarios.map(async (usuario) => {
+        return [usuario.name, usuario.phone];
+      })
+    );
+  } catch (error)
+  { 
+    console.log(error);
+  }
 };
 // const usuarioId=3; este codigo esta diseñado para buscar los post especificos de un usuario
 
@@ -103,7 +112,9 @@ while (cont == 0)
   let menu = parseInt(prompt("Ingrese el numero de cual funcionalidad desea Ejecutar \n1.Lista pendientes\n2.encontrar Usuario\n3.filtrar Post\n4.Modificar Estructura\n5.Manejar datos"));
   switch (menu) {
     case 1:
-      ListasPendientes().then();
+      ListasPendientes().then((data) => {
+        console.log(data);
+      });
       cont++;
       break;
     case 2:
