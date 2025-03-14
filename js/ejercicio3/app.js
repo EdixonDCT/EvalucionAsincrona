@@ -1,7 +1,7 @@
 import { getUsuarios, getPost, getCommets} from "../modulos/index.js";
 const URL = "https://jsonplaceholder.typicode.com";
 
-const encontrarUsuario = async (postName) => {
+const filtrarPost = async (postName) => {
   const usuarios = await getUsuarios(URL);
   return await Promise.all(
     usuarios.map(async (usuario) => {
@@ -18,4 +18,4 @@ const encontrarUsuario = async (postName) => {
   );
 };
 let postName = prompt("Ingrese el nombre del post que desea buscar");
-encontrarUsuario(postName).then();
+filtrarPost(postName).then();

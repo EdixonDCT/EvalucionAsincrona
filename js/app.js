@@ -22,6 +22,7 @@ const manejardatos = async () => {//manejar datos es la promesa principal donde 
         //retorna la promesa completa ya que se necesita para la impresion de datos que se ejecuten
         //el promise all es para que cumplan todas las condiciones en las promesas
         //usuarios.map se utiliza como el for es un ciclo repetitivo el cual accedera a cada valor especifico
+        //y retorna un arreglo modificado
         // de usuarios async es para volverlo una promesa lo que exista dentro y usuario seria el objeto
         const posts = await getPost(URL,usuario);//accede al metodo post que nececsita url y usuario
         //el url es para acortar codigo y el usuario es porque necesita el id para ver sus posts 
